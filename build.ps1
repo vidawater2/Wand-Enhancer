@@ -96,7 +96,14 @@ Invoke-Step 'Build web-panel' {
 }
 
 Invoke-Step 'Test web-panel' {
-    & $pnpm --dir $webPanelDir exec vitest run
+    $previousNodeOptions = $env:NODE_OPTIONS
+    $env:NODE_OPTIONS = "$previousNodeOptions --no-experimental-webstorage".Trim()
+    try {
+        & $pnpm --dir $webPanelDir exec vitest run
+    }
+    finally {
+        $env:NODE_OPTIONS = $previousNodeOptions
+    }
 }
 
 Invoke-Step 'Restore NuGet packages' {
